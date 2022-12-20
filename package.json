@@ -10,9 +10,11 @@
   "homepage": "https://github.com/BonnierNews/exp-logger",
   "license": "MIT",
   "dependencies": {
-    "exp-config": "^4.2.0",
-    "exp-correlator": "^1.0.0",
     "pino": "^8.8.0",
     "pino-pretty": "^9.1.1"
+  },
+  "peerDependencies": {
+    "exp-config": "^4.x",
+    "exp-correlator": "^1.x"
   }
 }
