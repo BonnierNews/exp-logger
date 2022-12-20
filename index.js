@@ -21,7 +21,7 @@ function severity(label) {
     case "debug":
       return "DEBUG";
     case "info":
-      return "INFO (0)";
+      return "INFO";
     case "warn":
       return "WARNING";
     case "error":
