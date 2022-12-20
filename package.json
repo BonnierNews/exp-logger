@@ -7,7 +7,6 @@
     "test": ""
   },
   "author": "Bonnier News AB",
-  "contributors": [],
   "homepage": "https://github.com/BonnierNews/exp-logger",
   "license": "MIT",
   "dependencies": {
