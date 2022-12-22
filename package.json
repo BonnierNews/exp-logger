@@ -1,5 +1,5 @@
 {
-  "name": "exp-logger",
+  "name": "@bonniernews/exp-logger",
   "version": "1.0.0",
   "description": "Simple bootstrapping of pino logger",
   "main": "index.js",
