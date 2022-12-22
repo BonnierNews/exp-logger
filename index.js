@@ -1,13 +1,9 @@
 "use strict";
 const pino = require("pino");
 
-const config = require("exp-config");
-const { getId } = require("exp-correlator");
-
-function severity(label) {
-  // In case of new/different labels it can be added through config
-  if (config.logging?.severityLabels?.length > 0) {
-    for (const object of config.severityLabels) {
+function severity(label, severityLabels) {
+  if (severityLabels.length > 0) {
+    for (const object of severityLabels) {
       if (object.label === label) {
         return object.newLabel;
       }
@@ -32,32 +28,37 @@ function severity(label) {
   }
 }
 
-const testLogLocation =
-  config.envName === "test"
-    ? process.env.LOG_LOCATION || config.logging?.testLog || "./logs/test.log"
-    : 1;
-const shouldPrettyPrint = ["development", "test"].includes(config.envName);
-const logger = pino(
-  {
-    level: process.env.LOG_LEVEL || config.logLevel || "info",
-    formatters: {
-      level(label) {
-        return { level: label, severity: severity(label) };
+function init({
+  logLevel = "info",
+  mixin,
+  shouldPrettyPrint = false,
+  severityLabels = [],
+  logLocation = "./logs/test.log",
+  setDestination = false,
+}) {
+  const env = process.env.NODE_ENV;
+  return pino(
+    {
+      level: logLevel,
+      formatters: {
+        level(label) {
+          return { level: label, severity: severity(label, severityLabels) };
+        },
       },
-    },
-    timestamp: () => `, "time": "${new Date().toISOString()}"`,
-    transport: {
-      target: "pino-pretty",
-      options: shouldPrettyPrint && {
-        destination: testLogLocation,
-        colorize: shouldPrettyPrint && config.envName !== "test",
-        ignore: "pid,hostname",
+      timestamp: () => `, "time": "${new Date().toISOString()}"`,
+      transport: {
+        target: "pino-pretty",
+        options: shouldPrettyPrint && {
+          destination: setDestination ? logLocation : 1,
+          colorize: setDestination === false,
+          ignore: "pid,hostname",
+        },
       },
+      messageKey: "message",
+      mixin,
     },
-    messageKey: "message",
-    mixin: () => ({ correlationId: getId() }),
-  },
-  config.envName === "test" && pino.destination(testLogLocation)
-);
+    setDestination && pino.destination(logLocation)
+  );
+}
 
-module.exports = logger;
+module.exports = init;

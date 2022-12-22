@@ -1,7 +1,8 @@
 # exp-logger
 
-Simple logger package to unify how logging is done with (configurable) remapping
+Simple logger package to unify how logging is done with (configurable) remapping 
 
+[NPM](https://www.npmjs.com/package/@bonniernews/exp-logger)
 ___
 ## defaults
 * trace -> DEBUG  
@@ -12,31 +13,20 @@ ___
 * fatal -> CRITICAL
 
 ___
-## optional 
-if you want to add more logging / platform specific labels you can configure it by adding it to a config file 
-
-```json
-{
-    ...
-    "logging": {
-        "severityLabels": [
-            {
-                "label": "foo",
-                "newLabel": "bar"
-            }
-        ]
-    }
-    ...
-}
+## options
+```js
+  logLevel // defaults to info
+  mixin  // pino mixins, passed down to pino as is
+  shouldPrettyPrint // defaults to false
+  severityLabels // add extra label mappings, [ {label: "oldKey", newLabel: "newKey"}]
+  logLocation // location of the test log
+  setDestination // default is false, set this to true to log to logLocation
 ```
+## example
+```js
 
-change the location of the test log
-default is `./logs/test.log`  
-You can change the location with either a config or env variable.  
-ENV: `LOG_LOCATION=./foo/bar/biz.log`
-config: 
-```json
-"logging": {
-    "testLog": "./foo/bar/biz.log"
-}
+const logger = require('@bonniernews/exp-logger')({
+    shouldPrettyPrint: process.NODE_ENV === "development",
+})
+
 ```
