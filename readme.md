@@ -28,5 +28,15 @@ if you want to add more logging / platform specific labels you can configure it 
     }
     ...
 }
+```
 
-
+change the location of the test log
+default is `./logs/test.log`  
+You can change the location with either a config or env variable.  
+ENV: `LOG_LOCATION=./foo/bar/biz.log`
+config: 
+```json
+"logging": {
+    "testLog": "./foo/bar/biz.log"
+}
+```

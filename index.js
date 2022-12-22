@@ -5,7 +5,6 @@ const config = require("exp-config");
 const { getId } = require("exp-correlator");
 
 function severity(label) {
-    
   // In case of new/different labels it can be added through config
   if (config.logging?.severityLabels?.length > 0) {
     for (const object of config.severityLabels) {
@@ -33,6 +32,10 @@ function severity(label) {
   }
 }
 
+const testLogLocation =
+  config.envName === "test"
+    ? process.env.LOG_LOCATION || config.logging?.testLog || "./logs/test.log"
+    : 1;
 const shouldPrettyPrint = ["development", "test"].includes(config.envName);
 const logger = pino(
   {
@@ -46,15 +49,15 @@ const logger = pino(
     transport: {
       target: "pino-pretty",
       options: shouldPrettyPrint && {
-        destination: config.envName === "test" ? "./logs/test.log" : 1,
-        colorize: shouldPrettyPrint,
+        destination: testLogLocation,
+        colorize: shouldPrettyPrint && config.envName !== "test",
         ignore: "pid,hostname",
       },
     },
     messageKey: "message",
     mixin: () => ({ correlationId: getId() }),
   },
-  config.envName === "test" && pino.destination("logs/test.log")
+  config.envName === "test" && pino.destination(testLogLocation)
 );
 
-module.exports = logger
+module.exports = logger;
