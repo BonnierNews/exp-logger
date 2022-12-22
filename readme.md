@@ -11,14 +11,13 @@ ___
 * warn -> WARNING  
 * error -> ERROR  
 * fatal -> CRITICAL
-
 ___
 ## options
 ```js
   logLevel // defaults to info
   mixin  // pino mixins, passed down to pino as is
   shouldPrettyPrint // defaults to false
-  severityLabels // add extra label mappings, [ {label: "oldKey", newLabel: "newKey"}]
+  severityLabels // replace or add label mappings, [ {label: "oldKey", newLabel: "newKey"}]
   logLocation // location of the test log
   setDestination // default is false, set this to true to log to logLocation
 ```
@@ -27,6 +26,15 @@ ___
 
 const logger = require('@bonniernews/exp-logger')({
     shouldPrettyPrint: process.NODE_ENV === "development",
+    severityLabels: [ {label: "info", newLabel: "foo" }]
 })
 
+logger.info("Hello world")
+
+/* 
+-- expected output
+[15:19:13.240] INFO:
+    severity: "foo"
+    message: "Hello world"
+*/
 ```

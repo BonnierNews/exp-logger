@@ -1,14 +1,11 @@
 "use strict";
 const pino = require("pino");
 
-function severity(label, severityLabels) {
-  if (severityLabels.length > 0) {
-    for (const object of severityLabels) {
-      if (object.label === label) {
-        return object.newLabel;
-      }
-    }
-  }
+let severityLabelsMap = null;
+
+function severity(label) {
+  if (severityLabelsMap && severityLabelsMap.has(label))
+    return severityLabelsMap.get(label);
 
   switch (label) {
     case "trace":
@@ -36,13 +33,17 @@ function init({
   logLocation = "./logs/test.log",
   setDestination = false,
 }) {
-  const env = process.env.NODE_ENV;
-  return pino(
+  if (!severityLabelsMap)
+    severityLabelsMap = new Map(
+      severityLabels.map((o) => [o.label, o.newLabel])
+    );
+
+    return pino(
     {
       level: logLevel,
       formatters: {
         level(label) {
-          return { level: label, severity: severity(label, severityLabels) };
+          return { level: label, severity: severity(label) };
         },
       },
       timestamp: () => `, "time": "${new Date().toISOString()}"`,
