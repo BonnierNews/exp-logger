@@ -12,9 +12,5 @@
   "dependencies": {
     "pino": "^8.8.0",
     "pino-pretty": "^9.1.1"
-  },
-  "peerDependencies": {
-    "exp-config": "^4.x",
-    "exp-correlator": "^1.x"
   }
 }
