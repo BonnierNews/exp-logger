@@ -35,12 +35,16 @@ function severity(label) {
  */
 
 /**
- * @param {LoggerOptions} options 
+ * @param {LoggerOptions} options
  * @return {object} the logger.
- * 
+ *
  */
 function init(options) {
-  const detailedLog = !options?.shouldPrettyPrint && !options?.logLocation;
+  const shouldPrettyPrint =
+    options?.shouldPrettyPrint ??
+    ["development", "test", "dev"].includes(process.env.NODE_ENV?.toLowerCase());
+
+  const logLocation = options?.logLocation ?? (process.env.NODE_ENV?.toLowerCase() === "test" && "./logs/test.log")
 
   if (!severityLabelsMap && options?.severityLabels) {
     severityLabelsMap = new Map(
@@ -54,22 +58,22 @@ function init(options) {
       level(label) {
         return {
           level: label,
-          ...(detailedLog && { severity: severity(label) }),
+          ...(!shouldPrettyPrint && { severity: severity(label) }),
         };
       },
     },
     timestamp: () => `, "time": "${new Date().toISOString()}"`,
-    transport: !detailedLog
+    transport: shouldPrettyPrint
       ? {
           target: "pino-pretty",
           options: {
-            destination: options.logLocation ?? 1,
-            colorize: !options.logLocation,
+            destination: logLocation ?? 1,
+            colorize: shouldPrettyPrint && !logLocation,
             ignore: "pid,hostname",
           },
         }
       : undefined,
-    ...(detailedLog && { messageKey: "message" }),
+    ...(!shouldPrettyPrint && { messageKey: "message" }),
     mixin: options?.mixin,
   });
 }
