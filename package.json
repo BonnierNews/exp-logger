@@ -4,7 +4,7 @@
   "description": "Simple bootstrapping of pino logger",
   "main": "index.js",
   "scripts": {
-    "test": ""
+    "test": "node test/test.js"
   },
   "author": "Bonnier News AB",
   "homepage": "https://github.com/BonnierNews/exp-logger",

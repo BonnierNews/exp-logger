@@ -25,41 +25,53 @@ function severity(label) {
   }
 }
 
-function init({
-  logLevel = "info",
-  mixin,
-  shouldPrettyPrint = false,
-  severityLabels = [],
-  logLocation = "./logs/test.log",
-  setDestination = false,
-}) {
-  if (!severityLabelsMap)
-    severityLabelsMap = new Map(
-      severityLabels.map((o) => [o.label, o.newLabel])
-    );
+/**
+ * @typedef LoggerOptions
+ * @property {string} options.logLevel="info" which level of severity to log at
+ * @property {string} options.logLocation where the log file will be located
+ * @property {boolean} options.shouldPrettyPrint if it should be a pretty one line print (true) or a json object (false)
+ * @property { [ { label: string, newLabel: string } ] } options.severityLabels add more severity labels
+ * @property {function} options.mixin mixin for additional information in the log statement
+ */
 
-    return pino(
-    {
-      level: logLevel,
-      formatters: {
-        level(label) {
-          return { level: label, severity: severity(label) };
-        },
+/**
+ * @param {LoggerOptions} options 
+ * @return {object} the logger.
+ * 
+ */
+function init(options) {
+  const detailedLog = !options?.shouldPrettyPrint && !options?.logLocation;
+
+  if (!severityLabelsMap && options?.severityLabels) {
+    severityLabelsMap = new Map(
+      options.severityLabels.map((o) => [o.label, o.newLabel])
+    );
+  }
+
+  return pino({
+    level: options?.logLevel ?? "info",
+    formatters: {
+      level(label) {
+        return {
+          level: label,
+          ...(detailedLog && { severity: severity(label) }),
+        };
       },
-      timestamp: () => `, "time": "${new Date().toISOString()}"`,
-      transport: {
-        target: "pino-pretty",
-        options: shouldPrettyPrint && {
-          destination: setDestination ? logLocation : 1,
-          colorize: setDestination === false,
-          ignore: "pid,hostname",
-        },
-      },
-      messageKey: "message",
-      mixin,
     },
-    setDestination && pino.destination(logLocation)
-  );
+    timestamp: () => `, "time": "${new Date().toISOString()}"`,
+    transport: !detailedLog
+      ? {
+          target: "pino-pretty",
+          options: {
+            destination: options.logLocation ?? 1,
+            colorize: !options.logLocation,
+            ignore: "pid,hostname",
+          },
+        }
+      : undefined,
+    ...(detailedLog && { messageKey: "message" }),
+    mixin: options?.mixin,
+  });
 }
 
 module.exports = init;

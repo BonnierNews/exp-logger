@@ -19,7 +19,6 @@ ___
   shouldPrettyPrint // defaults to false
   severityLabels // replace or add label mappings, [ {label: "oldKey", newLabel: "newKey"}]
   logLocation // location of the test log
-  setDestination // default is false, set this to true to log to logLocation
 ```
 ## example
 ```js
@@ -33,8 +32,6 @@ logger.info("Hello world")
 
 /* 
 -- expected output
-[15:19:13.240] INFO:
-    severity: "foo"
-    message: "Hello world"
+[15:19:13.240] INFO: Hello world
 */
 ```
