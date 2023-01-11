@@ -40,11 +40,12 @@ function severity(label) {
  *
  */
 function init(options) {
+  const env = process.env.NODE_ENV || "development";
   const shouldPrettyPrint =
-    options?.shouldPrettyPrint ??
-    ["development", "test", "dev"].includes(process.env.NODE_ENV?.toLowerCase());
+    options?.shouldPrettyPrint ?? ["development", "test", "dev"].includes(env);
 
-  const logLocation = options?.logLocation ?? (process.env.NODE_ENV?.toLowerCase() === "test" && "./logs/test.log")
+  const logLocation =
+    options?.logLocation ?? (env === "test" && "./logs/test.log");
 
   if (!severityLabelsMap && options?.severityLabels) {
     severityLabelsMap = new Map(
