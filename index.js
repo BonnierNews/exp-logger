@@ -1,12 +1,7 @@
 "use strict";
 const pino = require("pino");
 
-let severityLabelsMap = null;
-
 function severity(label) {
-  if (severityLabelsMap && severityLabelsMap.has(label))
-    return severityLabelsMap.get(label);
-
   switch (label) {
     case "trace":
       return "DEBUG";
@@ -28,9 +23,6 @@ function severity(label) {
 /**
  * @typedef LoggerOptions
  * @property {string} options.logLevel="info" which level of severity to log at
- * @property {string} options.logLocation where the log file will be located
- * @property {boolean} options.shouldPrettyPrint if it should be a pretty one line print (true) or a json object (false)
- * @property { [ { label: string, newLabel: string } ] } options.severityLabels add more severity labels
  * @property {function} options.mixin mixin for additional information in the log statement
  */
 
@@ -41,18 +33,9 @@ function severity(label) {
  */
 function init(options) {
   const env = process.env.NODE_ENV || "development";
-  const shouldPrettyPrint =
-    options?.shouldPrettyPrint ?? ["development", "test", "dev"].includes(env);
+  const shouldPrettyPrint = ["development", "test", "dev"].includes(env);
 
-  const logLocation =
-    options?.logLocation ?? (env === "test" && "./logs/test.log");
-
-  if (!severityLabelsMap && options?.severityLabels) {
-    severityLabelsMap = new Map(
-      options.severityLabels.map((o) => [o.label, o.newLabel])
-    );
-  }
-
+  const logLocation = (env === "test" && "./logs/test.log");
   return pino({
     level: options?.logLevel ?? "info",
     formatters: {

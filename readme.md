@@ -16,17 +16,11 @@ ___
 ```js
   logLevel // defaults to info
   mixin  // pino mixins, passed down to pino as is
-  shouldPrettyPrint // defaults to true in NODE_ENV [development, test, dev]
-  severityLabels // replace or add label mappings, [ {label: "oldKey", newLabel: "newKey"}]
-  logLocation // location of the test log, defaults to ./logs/test.log in NODE_ENV=test
 ```
 ## example
 ```js
 
-const logger = require('@bonniernews/exp-logger')({
-    shouldPrettyPrint: process.NODE_ENV === "development",
-    severityLabels: [ {label: "info", newLabel: "foo" }]
-})
+const logger = require('@bonniernews/exp-logger')()
 
 logger.info("Hello world")
 
