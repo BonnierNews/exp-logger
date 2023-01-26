@@ -1,12 +1,7 @@
 "use strict";
 const pino = require("pino");
 
-let severityLabelsMap = null;
-
 function severity(label) {
-  if (severityLabelsMap && severityLabelsMap.has(label))
-    return severityLabelsMap.get(label);
-
   switch (label) {
     case "trace":
       return "DEBUG";
@@ -25,41 +20,46 @@ function severity(label) {
   }
 }
 
-function init({
-  logLevel = "info",
-  mixin,
-  shouldPrettyPrint = false,
-  severityLabels = [],
-  logLocation = "./logs/test.log",
-  setDestination = false,
-}) {
-  if (!severityLabelsMap)
-    severityLabelsMap = new Map(
-      severityLabels.map((o) => [o.label, o.newLabel])
-    );
+/**
+ * @typedef LoggerOptions
+ * @property {string} options.logLevel="info" which level of severity to log at
+ * @property {function} options.mixin mixin for additional information in the log statement
+ */
 
-    return pino(
-    {
-      level: logLevel,
-      formatters: {
-        level(label) {
-          return { level: label, severity: severity(label) };
-        },
+/**
+ * @param {LoggerOptions} options
+ * @return {object} the logger.
+ *
+ */
+function init(options) {
+  const env = process.env.NODE_ENV || "development";
+  const shouldPrettyPrint = ["development", "test", "dev"].includes(env);
+
+  const logLocation = (env === "test" && "./logs/test.log");
+  return pino({
+    level: options?.logLevel ?? "info",
+    formatters: {
+      level(label) {
+        return {
+          level: label,
+          ...(!shouldPrettyPrint && { severity: severity(label) }),
+        };
       },
-      timestamp: () => `, "time": "${new Date().toISOString()}"`,
-      transport: {
-        target: "pino-pretty",
-        options: shouldPrettyPrint && {
-          destination: setDestination ? logLocation : 1,
-          colorize: setDestination === false,
-          ignore: "pid,hostname",
-        },
-      },
-      messageKey: "message",
-      mixin,
     },
-    setDestination && pino.destination(logLocation)
-  );
+    timestamp: () => `, "time": "${new Date().toISOString()}"`,
+    transport: shouldPrettyPrint
+      ? {
+          target: "pino-pretty",
+          options: {
+            destination: logLocation ?? 1,
+            colorize: shouldPrettyPrint && !logLocation,
+            ignore: "pid,hostname",
+          },
+        }
+      : undefined,
+    ...(!shouldPrettyPrint && { messageKey: "message" }),
+    mixin: options?.mixin,
+  });
 }
 
 module.exports = init;
