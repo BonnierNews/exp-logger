@@ -26,9 +26,11 @@ function severity(label) {
  * @property {function} options.mixin mixin for additional information in the log statement
  */
 
+/** @typedef {import("pino").Logger} Logger */
+
 /**
  * @param {LoggerOptions} options
- * @return {object} the logger.
+ * @return {Logger} the logger.
  *
  */
 function init(options) {
