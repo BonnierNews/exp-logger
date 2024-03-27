@@ -1,6 +1,6 @@
 {
   "name": "@bonniernews/exp-logger",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Simple bootstrapping of pino logger",
   "main": "index.js",
   "scripts": {
