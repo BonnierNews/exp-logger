@@ -24,6 +24,7 @@ function severity(label) {
  * @typedef LoggerOptions
  * @property {string} options.logLevel="info" which level of severity to log at
  * @property {function} options.mixin mixin for additional information in the log statement
+ * @property {function} [options.formatLog] function to do change the shape of the log object
  */
 
 /** @typedef {import("pino").Logger} Logger */
@@ -47,6 +48,7 @@ function init(options) {
           ...(!shouldPrettyPrint && { severity: severity(label) }),
         };
       },
+      ...(options.formatLog && { log: options?.formatLog }),
     },
     timestamp: () => `, "time": "${new Date().toISOString()}"`,
     transport: shouldPrettyPrint
