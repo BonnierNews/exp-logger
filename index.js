@@ -41,27 +41,28 @@ function init(options) {
   const logLocation = (env === "test" && "./logs/test.log");
   return pino({
     level: options?.logLevel ?? "info",
+    messageKey: "message",
+    base: undefined,
     formatters: {
       level(label) {
-        return {
-          level: label,
-          ...(!shouldPrettyPrint && { severity: severity(label) }),
-        };
+        if (shouldPrettyPrint) {
+          return { level: label };
+        }
+        return { severity: severity(label) };
       },
-      ...(options.formatLog && { log: options?.formatLog }),
+      ...(options?.formatLog && { log: options?.formatLog }),
     },
-    timestamp: () => `, "time": "${new Date().toISOString()}"`,
+    timestamp: () => `,"time": "${new Date().toISOString()}"`,
     transport: shouldPrettyPrint
       ? {
           target: "pino-pretty",
           options: {
-            destination: logLocation ?? 1,
-            colorize: shouldPrettyPrint && !logLocation,
-            ignore: "pid,hostname",
+            destination: logLocation || 1,
+            colorize: !logLocation,
+            messageKey: "message",
           },
         }
       : undefined,
-    ...(!shouldPrettyPrint && { messageKey: "message" }),
     mixin: options?.mixin,
   });
 }
