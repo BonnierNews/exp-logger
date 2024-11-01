@@ -64,6 +64,7 @@ function init(options) {
         }
       : undefined,
     mixin: options?.mixin,
+    redact: options?.redact,
   });
 }
 
