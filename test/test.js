@@ -17,3 +17,8 @@
   const logger = require("../index")();
   logger.info("hello world 3");
 }
+
+{
+  const logger = require("../index")({ redact: ["redactMe"] });
+  logger.info({ redactMe: "this should be redacted", notRedacted: "this should not" });
+}
